@@ -1,6 +1,32 @@
 # Changelog
 
-Changes to the standalone Kegel Exercise Timer, from the initial release through Version 4.
+Changes to the standalone Kegel Exercise Timer, from the initial release through Version 6.
+
+## [6.0.0] — Welcome screen
+
+### Added
+- A welcome screen on first use explaining the timer's capabilities and how to configure exercise parameters.
+- A "Don't show this welcome screen again" option, saved in `localStorage`.
+- An **About this timer** button to reopen the instructions at any time.
+
+### Preserved
+- All Version 5 functionality.
+
+## [5.0.0] — Two-set sessions
+
+### Added
+- Slow (Set 1) and fast (Set 2) contraction sets, each with its own contraction duration, relaxation duration, and repetition count.
+- Exercise modes: Both sets, Slow only, and Fast only.
+- Adjustable recovery period between sets (0–600 seconds, default 30), used in Both sets mode.
+- Automatic transitions between exercise phases and sets, with distinct audio cues for recovery and the start of the fast set.
+
+### Changed
+- Improved session labels (for example "Set 1 of 2") and the settings layout, which now groups options per set.
+- Default session is now slow (10 s / 10 s × 10) + 30 s recovery + fast (2 s / 2 s × 10), 4 minutes 18 seconds in total.
+- Settings are saved under a new `localStorage` key; v2-format settings are still read as a fallback.
+
+### Preserved
+- Audio controls (Test beep) and locally saved preferences.
 
 ## [4.0.0] — Collapsible settings
 
@@ -77,6 +103,16 @@ feat: add configurable intervals, repetitions, and saved settings
 feat: make exercise settings collapsible on mobile
 ```
 
-Suggested tags: `v1.0.0`, `v2.0.0`, `v3.0.0`, `v4.0.0`.
+**v5**
+```text
+feat: add two-set Kegel timer with customizable intervals
+```
+
+**v6**
+```text
+feat: add welcome screen and first-use instructions
+```
+
+Suggested tags: `v1.0.0`, `v2.0.0`, `v3.0.0`, `v4.0.0`, `v5.0.0`, `v6.0.0`.
 
 Note: This changelog documents observable differences between the preserved HTML files, not a record of historical Git commits. Browser audio may still be restricted when a phone is locked or a tab is in the background.

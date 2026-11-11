@@ -1,13 +1,17 @@
 # Kegel Exercise Timer
 
-A lightweight, mobile-friendly Kegel (pelvic-floor exercise) timer that runs in a web browser. It guides alternating contraction and relaxation periods with a visual countdown and audible cues.
+A lightweight, mobile-friendly Kegel (pelvic-floor exercise) timer that runs in a web browser. It guides alternating contraction and relaxation periods, in one or two sets (slow and fast), with a visual countdown and audible cues.
 
-**Current version:** v4.0.0
+**Current version:** v6.0.0
 
 ## Features
 
-- Separate, adjustable **contraction** and **relaxation** durations.
-- Adjustable number of contractions; there is no rest period after the final contraction.
+- Two exercise sets: **Set 1 — slow contractions** and **Set 2 — fast contractions**, each with its own adjustable contraction duration, relaxation duration, and number of contractions.
+- Three exercise modes: **Both sets**, **Slow only**, or **Fast only**.
+- Adjustable **recovery** period between the two sets (0 means no break); it applies only in Both sets mode.
+- Automatic transitions between sets and phases, with distinct audio cues for the recovery period and the start of the fast set.
+- No rest period after the final contraction of a set.
+- A welcome screen explaining the timer, with a "Don't show this again" option and an **About this timer** button to reopen it.
 - A prominent countdown, current phase, repetition counter, and progress indicator.
 - Audible cues for phase changes and session completion, plus a **Test beep** button.
 - **Start**, **Pause/Resume**, **Reset**, and **Start again** controls.
@@ -18,33 +22,38 @@ A lightweight, mobile-friendly Kegel (pelvic-floor exercise) timer that runs in 
 
 ## Default session
 
-| Setting | Default |
-| --- | ---: |
-| Contraction duration | 10 seconds |
-| Relaxation duration | 10 seconds |
-| Number of contractions | 10 |
-| Relaxation intervals | 9 |
-| **Total time** | **3 minutes 10 seconds** |
+Default mode: **Both sets**.
 
-The total session length is calculated as:
+| Setting | Set 1 (slow) | Set 2 (fast) |
+| --- | ---: | ---: |
+| Contraction duration | 10 seconds | 2 seconds |
+| Relaxation duration | 10 seconds | 2 seconds |
+| Number of contractions | 10 | 10 |
+| Relaxation intervals | 9 | 9 |
+| Set duration | 3 min 10 sec | 38 sec |
+
+Recovery between sets: 30 seconds. **Total time: 4 minutes 18 seconds.**
+
+The length of each set is calculated as:
 
 `(contraction seconds × contractions) + (relaxation seconds × (contractions − 1))`
 
 ### Adjustable ranges
 
-- Contractions: **1–120 seconds** each
-- Relaxation: **1–120 seconds** each
-- Number of contractions: **1–100**
+- Contractions: **1–120 seconds** each (per set)
+- Relaxation: **1–120 seconds** each (per set)
+- Number of contractions: **1–100** (per set)
+- Recovery between sets: **0–600 seconds**
 
 ## How to use
 
-1. Open the hosted timer in your browser.
-2. Optionally expand **Exercise settings** to change the durations or number of contractions.
+1. Open the hosted timer in your browser. On first use, read the welcome screen and tap **Go to timer**; tick the checkbox to skip it next time. **About this timer** reopens it.
+2. Optionally expand **Exercise settings**, choose an **Exercise mode** (Both sets, Slow only, Fast only), and adjust the durations, repetitions, and recovery time.
 3. Tap **Test beep** and adjust the device's media volume if needed.
-4. Tap **Start**. Follow the **Contract** and **Relax** prompts.
+4. Tap **Start**. Follow the **Contract**, **Relax**, and **Recover** prompts; the timer moves between phases and sets automatically.
 5. Use **Pause**, **Resume**, or **Reset** as needed. To change the settings, reset first.
 
-The timer automatically ends after the last contraction, without a final relaxation interval.
+Each set ends after its last contraction, without a final relaxation interval.
 
 ## Run locally
 
@@ -52,7 +61,7 @@ Download or clone the repository, then open `index.html` in a modern browser. On
 
 ## Publish with GitHub Pages
 
-1. Place the latest application file at the repository root, named **`index.html`**.
+1. The latest application file (currently v6) is the repository's root **`index.html`**; the versioned `Kegel_Timer_v*.html` files are preserved copies.
 2. In GitHub, go to **Settings → Pages**.
 3. Under **Build and deployment**, select **Deploy from a branch**, choose `main` and `/ (root)`, then save.
 4. Once GitHub publishes the site, open the Pages URL on your phone or computer.
@@ -78,6 +87,8 @@ The application attempts to keep the screen awake on browsers that support the S
 | **v2.0.0** | Improved audio activation and restart behavior; added a test beep. |
 | **v3.0.0** | Added adjustable timings, contraction count, automatic duration calculation, and locally saved settings. |
 | **v4.0.0** | Added collapsible exercise settings and automatic collapse on Start. |
+| **v5.0.0** | Added slow and fast contraction sets, slow-only/fast-only/both modes, and adjustable recovery between sets. |
+| **v6.0.0** | Added a welcome screen with first-use instructions, a hide-on-future-visits option, and an About button. |
 
 See [CHANGELOG.md](CHANGELOG.md) for release details.
 
@@ -87,4 +98,4 @@ This is a timing aid, not a medical treatment plan. Follow the contraction durat
 
 ## License
 
-No license is specified in this README. If you want others to have explicit permission to reuse, modify, or distribute the code, add a `LICENSE` file to the repository.
+Released under the MIT License. See [LICENSE](LICENSE).
