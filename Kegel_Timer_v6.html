@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101a2b">
+<title>Kegel Exercise Timer — V6</title>
+<style>
+:root{color-scheme:dark;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:#101a2b;color:#fff;min-height:100dvh;display:flex;justify-content:center;align-items:center;padding:24px 18px}
+main{width:100%;max-width:480px;text-align:center}
+h1{font-size:26px;font-weight:650;margin:0 0 16px}
+.settings{border:1px solid #3c4b62;background:#19283a;border-radius:16px;padding:0;margin-bottom:20px;text-align:left}
+.settings summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;cursor:pointer;font-size:16px;font-weight:650;color:#e2ebf6;touch-action:manipulation}
+.settings summary::-webkit-details-marker{display:none}
+.settings summary::after{content:"⌄";font-size:23px;line-height:1;color:#aab8cb;transition:transform .15s}
+.settings[open] summary::after{transform:rotate(180deg)}
+.settings .settings-body{padding:0 16px 14px}
+.settings .settings-caption{font-size:12px;color:#aab8cb;font-weight:400}
+.setting{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0}
+.setting label{font-size:15px;line-height:1.3}
+.setting input{width:88px;min-width:88px;border:1px solid #667991;background:#101a2b;color:#fff;font:650 19px system-ui;border-radius:10px;padding:8px;text-align:center}
+.setting input:disabled{opacity:.55}
+.setting select{width:135px;border:1px solid #667991;background:#101a2b;color:#fff;font:600 15px system-ui;border-radius:10px;padding:9px 5px}
+.group-title{font-size:14px;font-weight:750;color:#7ee6bf;margin:16px 0 5px;padding-top:10px;border-top:1px solid #40506a}
+#phase.recovery{color:#ffd58a}
+#session{font-size:19px;font-weight:750;color:#7ee6bf;margin:0 0 10px}
+.note{font-size:12px;color:#aab8cb;line-height:1.4;margin:9px 0 0}
+#phase{font-size:clamp(34px,9vw,60px);font-weight:800;min-height:1.3em}
+#phase.hold{color:#7ee6bf}#phase.rest{color:#87c8ff}
+#seconds{font-size:90px;line-height:1.15;font-variant-numeric:tabular-nums;font-weight:700;margin:8px 0}
+#progress{font-size:19px;margin-bottom:10px;color:#d5deeb}
+#description{color:#bcc8da;font-size:15px;margin-bottom:20px;line-height:1.5}
+button{border:0;border-radius:16px;padding:15px 22px;font:700 18px system-ui;background:#71e2b7;color:#102035;min-width:125px;margin:5px;cursor:pointer;touch-action:manipulation}
+button.secondary{background:#324257;color:#fff}
+button:disabled{opacity:.5}
+#track{height:9px;background:#334359;border-radius:20px;overflow:hidden;margin:17px 0 20px}
+#fill{height:100%;background:#73debd;width:0%;transition:width .1s linear}
+.small{font-size:13px;line-height:1.5;color:#aab8cb;margin-top:23px}
+#notice{font-size:13px;color:#ffd58a;min-height:1.5em;margin-top:8px}
+#welcome{position:fixed;inset:0;z-index:20;background:rgba(8,16,29,.94);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.welcome-card{width:100%;max-width:440px;background:#19283a;border:1px solid #40506a;border-radius:20px;padding:28px 24px;text-align:left;box-shadow:0 20px 45px #0008}
+.welcome-card h2{color:#7ee6bf;margin:0 0 18px;font-size:26px}
+.welcome-card p{line-height:1.6;color:#e2ebf6;margin:0 0 14px;font-size:16px}
+.welcome-card button{display:block;width:100%;margin:20px 0 0}
+.welcome-card label{display:flex;align-items:center;gap:10px;color:#c6d3e6;font-size:14px;margin-top:18px}
+.welcome-card input{width:18px;height:18px;accent-color:#71e2b7}
+#welcomeHelp{background:transparent;border:1px solid #40506a;color:#7ee6bf;font-size:13px;font-weight:650;min-width:0;padding:5px 11px;margin:0 0 14px;border-radius:9px}
+@media(max-width:375px){body{padding:16px 12px}#seconds{font-size:75px}button{min-width:105px;padding:13px 15px}}
+</style>
+</head>
+<body>
+<main>
+<h1>Kegel Exercise Timer</h1>
+<button id="welcomeHelp" type="button" aria-label="Show welcome instructions">About this timer</button>
+<details class="settings" id="settings" aria-label="Timer settings">
+<summary><span>Exercise settings</span><span class="settings-caption">Tap to edit</span></summary>
+<div class="settings-body">
+<div class="setting"><label for="modeInput">Exercise mode</label><select id="modeInput"><option value="both">Both sets</option><option value="slow">Slow only</option><option value="fast">Fast only</option></select></div>
+<div class="group-title" id="slowTitle">Set 1 — Slow contractions</div>
+<div class="setting slow-setting"><label for="holdInput">Contraction (seconds)</label><input id="holdInput" type="number" min="1" max="120" step="1" inputmode="numeric" value="10"></div>
+<div class="setting slow-setting"><label for="restInput">Relaxation (seconds)</label><input id="restInput" type="number" min="1" max="120" step="1" inputmode="numeric" value="10"></div>
+<div class="setting slow-setting"><label for="repsInput">Number of contractions</label><input id="repsInput" type="number" min="1" max="100" step="1" inputmode="numeric" value="10"></div>
+<div class="group-title" id="recoveryTitle">Recovery between sets</div>
+<div class="setting" id="recoveryRow"><label for="recoveryInput">Recovery (seconds)</label><input id="recoveryInput" type="number" min="0" max="600" step="1" inputmode="numeric" value="30"></div>
+<div class="group-title" id="fastTitle">Set 2 — Fast contractions</div>
+<div class="setting fast-setting"><label for="fastHoldInput">Contraction (seconds)</label><input id="fastHoldInput" type="number" min="1" max="120" step="1" inputmode="numeric" value="2"></div>
+<div class="setting fast-setting"><label for="fastRestInput">Relaxation (seconds)</label><input id="fastRestInput" type="number" min="1" max="120" step="1" inputmode="numeric" value="2"></div>
+<div class="setting fast-setting"><label for="fastRepsInput">Number of contractions</label><input id="fastRepsInput" type="number" min="1" max="100" step="1" inputmode="numeric" value="10"></div>
+<p class="note">Enter any whole number of seconds for recovery (0 means no break). Settings are saved on this device. Press Reset before changing settings during a session.</p>
+</div>
+</details>
+<div id="session">Two-set session (slow/fast)</div>
+<div id="phase" role="status" aria-live="polite">Ready</div>
+<div id="seconds">10</div>
+<div id="progress">10 contractions · 9 rests</div>
+<div id="track" role="progressbar" aria-label="Exercise progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="fill"></div></div>
+<div id="description">10 seconds contract, 10 seconds relax. Total: 3 min 10 sec.</div>
+<button id="start">Start</button><button id="reset" class="secondary">Reset</button><button id="test" class="secondary">Test beep</button>
+<div id="notice" aria-live="polite"></div>
+<div class="small">Keep the timer visible and your phone awake; browsers may silence audio when the screen locks or an app runs in the background. Increase media volume if needed. Stop if you feel pain or strain.</div>
+</main>
+<section id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" hidden>
+  <div class="welcome-card">
+    <h2 id="welcomeTitle">Welcome to Kegel Timer</h2>
+    <p>This Kegel timer supports exercises with one or two sets of slow or fast contractions. You can choose how many contractions to perform and set different durations for each contraction and relaxation period.</p>
+    <p>Open the <strong>Exercise settings</strong> dropdown to customize your routine. You can also adjust the recovery time between sets.</p>
+    <p>Your settings are saved on this device for your next session.</p>
+    <label><input type="checkbox" id="hideWelcome"> Don't show this welcome screen again</label>
+    <button type="button" id="closeWelcome">Go to timer</button>
+  </div>
+</section>
+<script>
+(()=>{
+'use strict';
+const KEY='kegel-timer-settings-v5', OLD_KEY='kegel-timer-settings-v2', WELCOME_KEY='kegel-timer-hide-welcome-v54';
+const defaults={mode:'both',hold:10,rest:10,reps:10,recovery:30,fastHold:2,fastRest:2,fastReps:10};
+const limits={hold:[1,120],rest:[1,120],reps:[1,100],recovery:[0,600],fastHold:[1,120],fastRest:[1,120],fastReps:[1,100]};
+const $=id=>document.getElementById(id);
+const nodes={mode:$('modeInput'),hold:$('holdInput'),rest:$('restInput'),reps:$('repsInput'),recovery:$('recoveryInput'),fastHold:$('fastHoldInput'),fastRest:$('fastRestInput'),fastReps:$('fastRepsInput')};
+const settingsPanel=$('settings'),phase=$('phase'),seconds=$('seconds'),progress=$('progress'),fill=$('fill'),track=$('track'),description=$('description'),start=$('start'),notice=$('notice'),session=$('session');
+let cfg={...defaults},parts=[],total=0;
+let audio=null,elapsed=0,startedAt=0,running=false,ticker=null,lastIndex=-1,wakeLock=null,runToken=0,completed=false;
+function clampNumber(value,key){const [lo,hi]=limits[key],n=Number(value);return Number.isFinite(n)&&String(value).trim()!==''?Math.min(hi,Math.max(lo,Math.round(n))):defaults[key]}
+function load(){try{const data=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem(OLD_KEY)||'null');if(data&&typeof data==='object'){for(const k of Object.keys(limits))cfg[k]=clampNumber(data[k]??defaults[k],k);if(['both','slow','fast'].includes(data.mode))cfg.mode=data.mode}}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(cfg))}catch(e){}}
+function fmtTime(s){s=Math.round(s);return Math.floor(s/60)+' min '+String(s%60).padStart(2,'0')+' sec'}
+function setup(){
+ parts=[];let at=0;
+ const add=(kind,set,number,len)=>{parts.push({kind,set,number,start:at,end:at+len});at+=len};
+ const block=(set,hold,rest,reps)=>{for(let i=1;i<=reps;i++){add('hold',set,i,hold);if(i<reps)add('rest',set,i,rest)}};
+ if(cfg.mode!=='fast')block('slow',cfg.hold,cfg.rest,cfg.reps);
+ if(cfg.mode==='both'&&cfg.recovery>0)add('recovery','recovery',0,cfg.recovery);
+ if(cfg.mode!=='slow')block('fast',cfg.fastHold,cfg.fastRest,cfg.fastReps);
+ total=at;
+ const label=cfg.mode==='both'?'Slow + fast':cfg.mode==='slow'?'Slow only':'Fast only';
+ description.textContent=`${label} · Total: ${fmtTime(total)}. ${cfg.mode==='both'?'Recovery: '+cfg.recovery+' sec.':''}`;
+ session.textContent=cfg.mode==='both'?'Two-set session (slow/fast)':cfg.mode==='slow'?'Slow contractions only':'Fast contractions only';
+ document.querySelectorAll('.slow-setting').forEach(el=>el.hidden=cfg.mode==='fast');
+ document.querySelectorAll('.fast-setting').forEach(el=>el.hidden=cfg.mode==='slow');
+ $('slowTitle').hidden=cfg.mode==='fast';$('fastTitle').hidden=cfg.mode==='slow';$('recoveryTitle').hidden=cfg.mode!=='both';$('recoveryRow').hidden=cfg.mode!=='both';
+}
+function setInputsDisabled(disabled){Object.values(nodes).forEach(n=>n.disabled=disabled)}
+function initAudio(){try{if(!audio)audio=new (window.AudioContext||window.webkitAudioContext)();if(audio.state!=='running')audio.resume().catch(()=>{});return true}catch(e){notice.textContent='Audio is not supported by this browser.';return false}}
+function beep(freq=880,duration=.20,count=1){
+ if(!initAudio())return;
+ try{const base=audio.currentTime+.015;
+ for(let i=0;i<count;i++){
+  const osc=audio.createOscillator(),gain=audio.createGain(),t=base+i*.33;
+  osc.type='sine';osc.frequency.setValueAtTime(freq,t);
+  gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(.42,t+.018);
+  gain.gain.setValueAtTime(.42,t+duration-.035);gain.gain.exponentialRampToValueAtTime(.0001,t+duration);
+  osc.connect(gain);gain.connect(audio.destination);
+  osc.onended=()=>{try{osc.disconnect();gain.disconnect()}catch(e){}};
+  osc.start(t);osc.stop(t+duration+.02);
+ }
+ }catch(e){notice.textContent='Audio was interrupted. Tap Test beep to reactivate.'}
+}
+function cue(index){
+ if(index>=parts.length){beep(1050,.22,3);if(navigator.vibrate)navigator.vibrate([100,100,100]);return}
+ const p=parts[index],prev=index>0?parts[index-1]:null;
+ if(p.kind==='recovery')beep(520,.23,2);
+ else if(p.set==='fast'&&(!prev||prev.set!=='fast'))beep(1180,.17,3);
+ else beep(p.kind==='hold'?960:640,.20);
+ if(navigator.vibrate)navigator.vibrate(100);
+}
+async function keepAwake(token){try{if('wakeLock'in navigator){const lock=await navigator.wakeLock.request('screen');if(token!==runToken||!running)await lock.release();else wakeLock=lock}}catch(e){}}
+function releaseWake(){if(wakeLock){wakeLock.release().catch(()=>{});wakeLock=null}}
+function clearTick(){if(ticker!==null){clearInterval(ticker);ticker=null}}
+function partIndex(t){if(t>=total)return parts.length;let lo=0,hi=parts.length-1;while(lo<hi){const m=(lo+hi)>>1;if(t<parts[m].end)hi=m;else lo=m+1}return lo}
+function render(){
+ const t=Math.min(total,elapsed),pct=total?t/total*100:0;
+ fill.style.width=pct+'%';track.setAttribute('aria-valuenow',String(Math.round(pct)));
+ if(t>=total){phase.textContent='Finished!';phase.className='';seconds.textContent='0';progress.textContent='Session complete';session.textContent='All selected sets complete';return}
+ const p=parts[partIndex(t)];
+ seconds.textContent=String(Math.ceil(p.end-t));
+ if(p.kind==='recovery'){phase.textContent='RECOVER';phase.className='recovery';session.textContent='Between sets';progress.textContent='Prepare for fast contractions';return}
+ const fast=p.set==='fast',reps=fast?cfg.fastReps:cfg.reps;
+ session.textContent=(fast?(cfg.mode==='both'?'Set 2 of 2':'Fast set'):(cfg.mode==='both'?'Set 1 of 2':'Slow set'))+' · '+(fast?'Fast contractions':'Slow contractions');
+ phase.textContent=p.kind==='hold'?'CONTRACT':'RELAX';phase.className=p.kind==='hold'?'hold':'rest';
+ progress.textContent=p.kind==='hold'?`Contraction ${p.number} of ${reps}`:`Rest ${p.number} of ${reps-1}`;
+}
+function tick(){
+ if(!running)return;
+ elapsed=Math.min(total,(performance.now()-startedAt)/1000);
+ const index=partIndex(elapsed);
+ if(index!==lastIndex){cue(index);lastIndex=index}
+ render();
+ if(index>=parts.length){running=false;completed=true;clearTick();start.textContent='Start again';setInputsDisabled(false);runToken++;releaseWake()}
+}
+function reset(){
+ running=false;runToken++;clearTick();releaseWake();elapsed=0;lastIndex=-1;completed=false;
+ start.textContent='Start';setInputsDisabled(false);phase.textContent='Ready';phase.className='';seconds.textContent=String(parts[0].end);
+ progress.textContent=cfg.mode==='both'?`${cfg.reps} slow + ${cfg.fastReps} fast contractions`:`${cfg.mode==='slow'?cfg.reps:cfg.fastReps} contractions`;
+ session.textContent=cfg.mode==='both'?'Two-set session (slow/fast)':cfg.mode==='slow'?'Slow contractions only':'Fast contractions only';
+ fill.style.width='0%';track.setAttribute('aria-valuenow','0');notice.textContent='';
+}
+function updateSettings(){if(running)return;for(const k of Object.keys(limits)){cfg[k]=clampNumber(nodes[k].value,k);nodes[k].value=String(cfg[k])}cfg.mode=nodes.mode.value;save();setup();reset()}
+for(const k of Object.keys(nodes))nodes[k].addEventListener('change',updateSettings);
+start.addEventListener('click',()=>{
+ initAudio();notice.textContent='';
+ if(running){elapsed=Math.min(total,(performance.now()-startedAt)/1000);running=false;runToken++;clearTick();start.textContent='Resume';releaseWake();render();return}
+ if(completed){elapsed=0;lastIndex=-1;completed=false}
+ settingsPanel.open=false;
+ startedAt=performance.now()-elapsed*1000;running=true;start.textContent='Pause';setInputsDisabled(true);
+ if(lastIndex>=0)beep(850,.15);
+ tick();ticker=setInterval(tick,50);keepAwake(++runToken);
+});
+$('reset').addEventListener('click',reset);
+$('test').addEventListener('click',()=>{initAudio();beep(880,.23,2)});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&running){initAudio();keepAwake(runToken);tick()}});
+const welcome=$('welcome'),welcomeClose=$('closeWelcome'),welcomeHelp=$('welcomeHelp'),hideWelcome=$('hideWelcome');
+function showWelcome(){welcome.hidden=false;hideWelcome.checked=false;welcomeClose.focus()}
+function closeWelcome(){if(hideWelcome.checked){try{localStorage.setItem(WELCOME_KEY,'1')}catch(e){}}welcome.hidden=true;welcomeHelp.focus()}
+welcomeClose.addEventListener('click',closeWelcome);
+welcomeHelp.addEventListener('click',showWelcome);
+load();for(const k of Object.keys(nodes))nodes[k].value=String(cfg[k]);setup();reset();
+try{if(localStorage.getItem(WELCOME_KEY)!=='1')showWelcome()}catch(e){showWelcome()}
+})();
+</script>
+</body>
+</html>
