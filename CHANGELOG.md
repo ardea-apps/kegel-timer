@@ -1,6 +1,23 @@
 # Changelog
 
-Changes to the standalone Kegel Exercise Timer, from the initial release through Version 6.
+Changes to the standalone Kegel Exercise Timer, from the initial release through Version 7.
+
+## [7.0.0] — Preparation countdowns and standardized audio signals
+
+### Added
+- A 5-second preparation countdown ("Get ready") before the first contraction of each set; no beep sounds until the first contraction begins.
+- A three-beep announcement before the second set, followed by its 5-second preparation countdown.
+
+### Changed
+- Audio signals are standardized: a high-pitched beep for contraction, a low-pitched beep for relaxation, and two beeps for completion of any set. The recovery period is silent.
+- Total session duration now includes the preparation periods and the short pauses for the end-of-set and announcement beeps.
+- Default recovery between sets reduced from 30 to 20 seconds. The default session now totals about 4 minutes 21 seconds.
+- Welcome screen rewritten with concise instructions on the exercise sequence and audio signals.
+
+### Preserved
+- Slow-only, fast-only, and both-sets modes.
+- Adjustable contraction, relaxation, recovery, and repetition settings, saved in `localStorage` (same storage keys as Version 5/6).
+- Start, Pause, Resume, Reset, and Test beep controls.
 
 ## [6.0.0] — Welcome screen
 
@@ -113,6 +130,11 @@ feat: add two-set Kegel timer with customizable intervals
 feat: add welcome screen and first-use instructions
 ```
 
-Suggested tags: `v1.0.0`, `v2.0.0`, `v3.0.0`, `v4.0.0`, `v5.0.0`, `v6.0.0`.
+**v7**
+```text
+feat: add preparation countdowns and standardized audio signals (v7)
+```
+
+Suggested tags: `v1.0.0`, `v2.0.0`, `v3.0.0`, `v4.0.0`, `v5.0.0`, `v6.0.0`, `v7.0.0`.
 
 Note: This changelog documents observable differences between the preserved HTML files, not a record of historical Git commits. Browser audio may still be restricted when a phone is locked or a tab is in the background.
