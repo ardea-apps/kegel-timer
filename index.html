@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101a2b">
-<title>Kegel Exercise Timer — V7</title>
+<title>Kegel Exercise Timer — V8</title>
 <style>
 :root{color-scheme:dark;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 *{box-sizing:border-box}
@@ -92,12 +92,12 @@ button:disabled{opacity:.5}
     <p>This timer guides you through one or two sets of pelvic floor exercises, with adjustable contraction, relaxation, and recovery intervals.</p>
     <h3 class="welcome-subtitle">How to Use</h3>
     <p>Open <strong>Exercise settings</strong> to customize your routine, then press <strong>Start</strong>.</p>
-    <p>Each set begins with a five-second preparation countdown. Follow the audio signals:</p>
+    <p>Each set is announced by three beeps, followed by a five-second preparation countdown. Follow the audio signals:</p>
     <ul class="welcome-cues">
       <li><strong>High-pitched beep:</strong> Contract your pelvic floor muscles.</li>
       <li><strong>Low-pitched beep:</strong> Relax your muscles.</li>
       <li><strong>Two beeps:</strong> The current set is complete.</li>
-      <li><strong>Three beeps:</strong> The second set is about to begin, followed by a five-second preparation countdown.</li>
+      <li><strong>Three beeps:</strong> A set is about to begin, followed by a five-second preparation countdown.</li>
     </ul>
     <p class="welcome-footnote">Your settings are saved automatically for your next session.</p>
     <label><input type="checkbox" id="hideWelcome"> Don't show this welcome screen again</label>
@@ -123,6 +123,8 @@ function fmtTime(s){s=Math.round(s);return Math.floor(s/60)+' min '+String(s%60)
 function setup(){
  parts=[];let at=0;
  const add=(kind,set,number,len)=>{parts.push({kind,set,number,start:at,end:at+len});at+=len};
+ // Opening three-beep signal, before the first set's five-second preparation.
+ add('announce',cfg.mode==='fast'?'fast':'slow',0,1.05);
  const block=(set,hold,rest,reps)=>{
   // Preparation takes five seconds before the very first contraction of each set.
   add('prepare',set,0,5);
@@ -192,7 +194,7 @@ function render(){
  if(p.kind==='recovery'){phase.textContent='RECOVER';phase.className='recovery';session.textContent='Between sets';progress.textContent='Prepare for fast contractions';return}
  const fast=p.set==='fast',reps=fast?cfg.fastReps:cfg.reps;
  session.textContent=(fast?(cfg.mode==='both'?'Set 2 of 2':'Fast set'):(cfg.mode==='both'?'Set 1 of 2':'Slow set'))+' · '+(fast?'Fast contractions':'Slow contractions');
- if(p.kind==='announce'){phase.textContent='SET 2 NEXT';phase.className='announce';progress.textContent='Three-beep announcement';return}
+ if(p.kind==='announce'){phase.textContent=(p.start===0?'SET STARTING':'SET 2 NEXT');phase.className='announce';progress.textContent='Three-beep announcement';return}
  if(p.kind==='prepare'){phase.textContent='GET READY';phase.className='prepare';progress.textContent='First contraction begins in '+Math.ceil(p.end-t)+' seconds';return}
  if(p.kind==='set-end'){phase.textContent='SET COMPLETE';phase.className='set-end';progress.textContent='Two-beep completion signal';return}
  phase.textContent=p.kind==='hold'?'CONTRACT':'RELAX';phase.className=p.kind==='hold'?'hold':'rest';
@@ -208,7 +210,7 @@ function tick(){
 }
 function reset(){
  running=false;runToken++;clearTick();releaseWake();silenceTones();elapsed=0;lastIndex=-1;completed=false;
- start.textContent='Start';setInputsDisabled(false);phase.textContent='Ready';phase.className='';seconds.textContent=String(parts[0].end);
+ start.textContent='Start';setInputsDisabled(false);phase.textContent='Ready';phase.className='';seconds.textContent='5';
  progress.textContent=cfg.mode==='both'?`${cfg.reps} slow + ${cfg.fastReps} fast contractions`:`${cfg.mode==='slow'?cfg.reps:cfg.fastReps} contractions`;
  session.textContent=cfg.mode==='both'?'Two-set session (slow/fast)':cfg.mode==='slow'?'Slow contractions only':'Fast contractions only';
  fill.style.width='0%';track.setAttribute('aria-valuenow','0');notice.textContent='';
