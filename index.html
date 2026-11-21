@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="apple-touch-icon" sizes="180x180" href="./icon.png">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101a2b">
@@ -210,7 +211,7 @@ function tick(){
 }
 function reset(){
  running=false;runToken++;clearTick();releaseWake();silenceTones();elapsed=0;lastIndex=-1;completed=false;
- start.textContent='Start';setInputsDisabled(false);phase.textContent='Ready';phase.className='';seconds.textContent='5';
+ start.textContent='Start';setInputsDisabled(false);phase.textContent='Ready';phase.className='';seconds.textContent=String(parts[0].end);
  progress.textContent=cfg.mode==='both'?`${cfg.reps} slow + ${cfg.fastReps} fast contractions`:`${cfg.mode==='slow'?cfg.reps:cfg.fastReps} contractions`;
  session.textContent=cfg.mode==='both'?'Two-set session (slow/fast)':cfg.mode==='slow'?'Slow contractions only':'Fast contractions only';
  fill.style.width='0%';track.setAttribute('aria-valuenow','0');notice.textContent='';
